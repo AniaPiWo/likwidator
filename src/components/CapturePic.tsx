@@ -48,7 +48,7 @@ export const CapturePic = (props: Props) => {
           canvasRef.current.height
         );
         setImage(canvasRef.current.toDataURL("image/png"));
-        setMsg(`Image captured successfully => ${image}`);
+        console.log(image);
       }
     }
   };
@@ -66,7 +66,6 @@ export const CapturePic = (props: Props) => {
 
   const handleCancel = () => {
     setImage(null);
-    captureImage();
     if (videoRef.current) {
       const stream = videoRef.current.srcObject as MediaStream;
       const tracks = stream?.getTracks() || [];
@@ -81,7 +80,7 @@ export const CapturePic = (props: Props) => {
         {cameraError && <p>{cameraError}</p>}
         {msg && <p className="text-pink-500">{msg}</p>}
         {image ? (
-          <Image src={image} alt="Captured image" width={400} height={400} />
+          <Image src={image} alt="Captured image" width={300} height={300} />
         ) : (
           <>
             <video
@@ -95,30 +94,19 @@ export const CapturePic = (props: Props) => {
           </>
         )}
 
-        <div className="flex justify-center items-center gap-4">
+        <div>
           <button
             onClick={captureImage}
-            className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
+            className="rounded-full h-20 w-20 flex justify-center items-center bg-violet-700 text-white"
           >
             <TbCapture />
           </button>
-
-          {image && (
-            <>
-              <button
-                className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
-                onClick={saveImage}
-              >
-                Save
-              </button>
-              <button
-                onClick={handleCancel}
-                className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
-              >
-                <p className="px-2">Cancel</p>
-              </button>
-            </>
-          )}
+          <button
+            onClick={handleCancel}
+            className="rounded-full w-32 px-8 py-4 border border-purple-900 text-purple-900 flex items-center justify-center"
+          >
+            <p className="px-2">Cancel</p>
+          </button>
         </div>
       </div>
     </>
