@@ -48,7 +48,7 @@ export const CapturePic = (props: Props) => {
           canvasRef.current.height
         );
         setImage(canvasRef.current.toDataURL("image/png"));
-        setMsg(`Image captured successfully => ${image}`);
+        setMsg(`Image captured successfully`);
       }
     }
   };
@@ -57,7 +57,7 @@ export const CapturePic = (props: Props) => {
     if (image) {
       const imageId = await saveImageToDatabase(image);
       if (imageId) {
-        setMsg("Image saved successfully");
+        setMsg("Image saved successfully with id: " + imageId);
       } else {
         setMsg("Failed to save image");
       }
@@ -98,7 +98,7 @@ export const CapturePic = (props: Props) => {
         <div className="flex justify-center items-center gap-4">
           <button
             onClick={captureImage}
-            className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
+            className="rounded-full h-20 w-20 flex justify-center items-center border border-white bg-white-700 text-white"
           >
             <TbCapture />
           </button>
@@ -106,14 +106,14 @@ export const CapturePic = (props: Props) => {
           {image && (
             <>
               <button
-                className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
+                className="rounded-full h-20 w-20 flex justify-center items-center border border-white bg-white-700 text-white"
                 onClick={saveImage}
               >
                 Save
               </button>
               <button
                 onClick={handleCancel}
-                className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
+                className="rounded-full h-20 w-20 flex justify-center items-center border border-white bg-white-700 text-white"
               >
                 <p className="px-2">Cancel</p>
               </button>
