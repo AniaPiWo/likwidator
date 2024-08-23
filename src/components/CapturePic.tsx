@@ -68,14 +68,19 @@ export const CapturePic = (props: Props) => {
   };
 
   const saveImage = async () => {
-    if (image) {
+    if (!image) {
+      return;
+    }
+    try {
       const imageId = await saveImageToDatabase(image);
       if (!imageId) {
         setMsg("Failed to save image");
       }
+      setImage(null);
+      setMsg("Image saved successfully");
+    } catch (error) {
+      setMsg("Failed to save image");
     }
-    setImage(null);
-    setMsg("Image saved successfully");
   };
 
   const handleCancel = () => {
@@ -104,18 +109,18 @@ export const CapturePic = (props: Props) => {
           </>
         )}
 
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-4 m">
           {image ? (
             <>
               <button
-                className="rounded-full h-20 w-20 flex justify-center items-center p-2 border border-white-700 bg-white-700 text-white"
+                className="rounded-full h-20 w-20 flex justify-center items-center p-1 border border-white-700 bg-white-700 text-white"
                 onClick={saveImage}
               >
                 Save
               </button>
               <button
                 onClick={handleCancel}
-                className="rounded-full h-20 w-20 flex justify-center items-center p-2 border border-white-700 bg-white-700 text-white"
+                className="rounded-full h-20 w-20 flex justify-center items-center p-1 border border-white-700 bg-white-700 text-white"
               >
                 <p className="px-2">Retake</p>
               </button>
@@ -123,7 +128,7 @@ export const CapturePic = (props: Props) => {
           ) : (
             <button
               onClick={captureImage}
-              className="rounded-full h-20 w-20 flex justify-center items-center p-2 border border-white-700 bg-white-700 text-white"
+              className="rounded-full h-20 w-20 flex justify-center items-center p-1 border border-white-700 bg-white-700 text-white"
             >
               <TbCapture />
             </button>
