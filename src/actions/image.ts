@@ -1,6 +1,7 @@
 "use server";
 import { checkUserInDatabase } from "@/actions/user";
 import { prisma } from "@/lib/prisma";
+import { get } from "http";
 
 export async function saveImageToDatabase(imageUrl: string) {
   try {
@@ -21,5 +22,25 @@ export async function saveImageToDatabase(imageUrl: string) {
     return image.id;
   } catch (error) {
     console.error("Error saving image to database:", error);
+  }
+}
+
+export async function getImagesFromDatabase() {
+  try {
+    const prismaUser = await checkUserInDatabase();
+
+    if (!prismaUser || !prismaUser.id) {
+      console.log("unauthorised user");
+      return "unauthorised user";
+    }
+
+    const images = await prisma.image.findMany({
+      where: {
+        userId: prismaUser.id,
+      },
+    });
+    return images;
+  } catch (error) {
+    console.error("Error getting images from database:", error);
   }
 }
