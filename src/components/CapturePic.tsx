@@ -104,14 +104,7 @@ export const CapturePic = (props: Props) => {
         )}
 
         <div className="flex justify-center items-center gap-4">
-          <button
-            onClick={captureImage}
-            className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
-          >
-            <TbCapture />
-          </button>
-
-          {image && (
+          {image ? (
             <>
               <button
                 className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
@@ -126,6 +119,13 @@ export const CapturePic = (props: Props) => {
                 <p className="px-2">Retake</p>
               </button>
             </>
+          ) : (
+            <button
+              onClick={captureImage}
+              className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
+            >
+              <TbCapture />
+            </button>
           )}
         </div>
       </div>
