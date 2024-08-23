@@ -6,7 +6,6 @@ import { getImagesFromDatabase } from "@/actions/image";
 type Props = {};
 
 export const ImagesGallery = (props: Props) => {
-  // Używamy SWR do pobierania obrazów z bazy danych
   const { data: images, error } = useSWR("images", getImagesFromDatabase);
 
   if (error) return <div>Failed to load images</div>;
@@ -15,7 +14,7 @@ export const ImagesGallery = (props: Props) => {
   return (
     <div>
       <h2>Images Gallery</h2>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         {(images as { id: string; base64: string }[]).map(
           (image: { id: string; base64: string }) => (
             <div key={image.id} className="border p-2">
