@@ -48,7 +48,7 @@ export const CapturePic = (props: Props) => {
           canvasRef.current.height
         );
         setImage(canvasRef.current.toDataURL("image/png"));
-        setMsg(`Image captured successfully => ${image}`);
+        setMsg(`Image captured successfully`);
       }
     }
   };
@@ -57,7 +57,7 @@ export const CapturePic = (props: Props) => {
     if (image) {
       const imageId = await saveImageToDatabase(image);
       if (imageId) {
-        setMsg("Image saved successfully");
+        setMsg(`Image saved successfully  => ${image}`);
       } else {
         setMsg("Failed to save image");
       }
@@ -66,12 +66,28 @@ export const CapturePic = (props: Props) => {
 
   const handleCancel = () => {
     setImage(null);
-    captureImage();
+    setMsg(null);
+
     if (videoRef.current) {
       const stream = videoRef.current.srcObject as MediaStream;
       const tracks = stream?.getTracks() || [];
       tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
+
+      // Restart the camera
+      navigator.mediaDevices
+        .getUserMedia({ video: { facingMode: "environment" } })
+        .then((newStream) => {
+          if (videoRef.current) {
+            videoRef.current.srcObject = newStream;
+            videoRef.current.play();
+          }
+          setCameraError(null);
+        })
+        .catch((err) => {
+          console.error("Failed to access camera:", err);
+          setCameraError("No camera available or permission denied.");
+        });
     }
   };
 
@@ -115,7 +131,7 @@ export const CapturePic = (props: Props) => {
                 onClick={handleCancel}
                 className="rounded-full h-20 w-20 flex justify-center items-center bg-white-700 text-white"
               >
-                <p className="px-2">Cancel</p>
+                <p className="px-2">Retake</p>
               </button>
             </>
           )}
