@@ -17,4 +17,12 @@ model User {
   id       String     @id @default(cuid())
   email    String     @unique
   name     String?
+  Image Image[]
 }
+
+model Image {
+  id       String     @id @default(cuid())
+  base64   String
+  userId   String
+  user     User       @relation(fields: [userId], references: [id])
+} 
