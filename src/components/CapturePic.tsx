@@ -7,16 +7,16 @@ import { saveImageToDatabase } from "@/actions/image";
 type Props = {};
 
 export const CapturePic = (props: Props) => {
-  //states
+  // states
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
-  //refs
+  // refs
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  useEffect(() => {
+  const startCamera = () => {
     if (videoRef.current) {
       navigator.mediaDevices
         .getUserMedia({ video: { facingMode: "environment" } })
@@ -32,6 +32,21 @@ export const CapturePic = (props: Props) => {
           setCameraError("No camera available or permission denied.");
         });
     }
+  };
+
+  useEffect(() => {
+    startCamera();
+
+    // Cleanup on component unmount
+    return () => {
+      if (videoRef.current) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        if (stream) {
+          const tracks = stream.getTracks();
+          tracks.forEach((track) => track.stop());
+        }
+      }
+    };
   }, []);
 
   const captureImage = () => {
@@ -56,9 +71,7 @@ export const CapturePic = (props: Props) => {
   const saveImage = async () => {
     if (image) {
       const imageId = await saveImageToDatabase(image);
-      if (imageId) {
-        setMsg(`Image saved successfully  => ${image}`);
-      } else {
+      if (!imageId) {
         setMsg("Failed to save image");
       }
     }
@@ -67,28 +80,7 @@ export const CapturePic = (props: Props) => {
   const handleCancel = () => {
     setImage(null);
     setMsg(null);
-
-    if (videoRef.current) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      const tracks = stream?.getTracks() || [];
-      tracks.forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-
-      // Restart the camera
-      navigator.mediaDevices
-        .getUserMedia({ video: { facingMode: "environment" } })
-        .then((newStream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = newStream;
-            videoRef.current.play();
-          }
-          setCameraError(null);
-        })
-        .catch((err) => {
-          console.error("Failed to access camera:", err);
-          setCameraError("No camera available or permission denied.");
-        });
-    }
+    startCamera(); // Restart the camera when cancelling
   };
 
   return (
