@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { FaMicrophone } from "react-icons/fa";
 
 // Rozszerzenie typu Window o webkitSpeechRecognition
 declare global {
@@ -126,13 +127,18 @@ export const VoiceInput: React.FC = () => {
     <div>
       <button
         onClick={handleListen}
-        style={{ fontSize: "24px", padding: "10px", cursor: "pointer" }}
+        style={{
+          fontSize: "24px",
+          padding: "10px",
+          cursor: "pointer",
+          transition: "transform 0.3s ease",
+          animation: listening ? "rotate-half 1s infinite linear" : "none",
+        }}
       >
-        🎤 {listening ? "Zatrzymaj nasłuchiwanie" : "Rozpocznij nasłuchiwanie"}
+        🎤 {listening ? "Zatrzymaj nasłuchiwanie" : <FaMicrophone />}
       </button>
       {transcript && (
         <>
-          <h3>Rozpoznany tekst:</h3>
           <p>{transcript}</p>
         </>
       )}
@@ -141,6 +147,22 @@ export const VoiceInput: React.FC = () => {
           <strong>Błąd:</strong> {errorMessage}
         </div>
       )}
+
+      <style>
+        {`
+      @keyframes rotate-half {
+        0% {
+          transform: rotate(0deg);
+        }
+        50% {
+          transform: rotate(180deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    `}
+      </style>
     </div>
   );
 };
