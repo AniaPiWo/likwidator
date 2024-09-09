@@ -18,7 +18,7 @@ export async function transcribeAudio(file: File): Promise<string> {
     const data = await response.json();
     return data.transcription;
   } catch (error) {
-    console.error("Error during transcription process:", error);
-    throw new Error(`Error during transcription: ${error}`);
+    console.error(error?.toString() as string);
+    throw new Error(error?.toString() as string);
   }
 }
