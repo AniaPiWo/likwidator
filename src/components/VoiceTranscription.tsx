@@ -5,10 +5,12 @@ import { transcribeAudio } from "@/actions/voice"; // Importujemy funkcję serwe
 export const VoiceTranscription: React.FC = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcription, setTranscription] = useState<string>("");
+  const [error, setError] = useState<string | null>(null); // Dodany stan błędów
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
+    setError(null); // Reset błędu przy każdym nowym nagraniu
     setIsRecording(true);
 
     try {
@@ -22,22 +24,28 @@ export const VoiceTranscription: React.FC = () => {
       };
 
       mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/mp3",
-        });
+        try {
+          const audioBlob = new Blob(audioChunksRef.current, {
+            type: "audio/mp3",
+          });
 
-        const file = new File([audioBlob], "recording.mp3", {
-          type: "audio/mp3",
-        });
+          const file = new File([audioBlob], "recording.mp3", {
+            type: "audio/mp3",
+          });
 
-        // Wywołanie funkcji serwerowej bez API route
-        const transcriptionText = await transcribeAudio(file);
-        setTranscription(transcriptionText);
+          // Wywołanie funkcji serwerowej bez API route
+          const transcriptionText = await transcribeAudio(file);
+          setTranscription(transcriptionText);
+        } catch (error) {
+          setError("Error during transcription. Please try again.");
+        }
       };
 
       mediaRecorderRef.current.start();
     } catch (error) {
-      console.error("Error accessing the microphone: ", error);
+      setError(
+        "Error accessing the microphone. Please check your permissions."
+      );
       setIsRecording(false);
     }
   };
@@ -53,6 +61,13 @@ export const VoiceTranscription: React.FC = () => {
       <button onClick={isRecording ? stopRecording : startRecording}>
         {isRecording ? "Stop Recording" : "Start Recording"}
       </button>
+
+      {error && (
+        <div style={{ color: "red", marginTop: "10px" }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
       {transcription && (
         <div>
           <h2>Transcription:</h2>
