@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { CopyIcon, MicIcon } from "@/components/ui/icon";
 import { toast, Toaster } from "sonner";
+import { openai } from "@/lib/openai"; // Importowanie klienta OpenAI
 
 export default function WhisperComponent() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -52,35 +53,21 @@ export default function WhisperComponent() {
 
   const sendAudioToWhisperAPI = async (audioBlob: Blob) => {
     const formData = new FormData();
-    formData.append("file", audioBlob, `audio.mp3`);
+    formData.append("file", audioBlob, "audio.mp3");
     formData.append("model", "whisper-1");
 
     try {
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        throw new Error("OpenAI API key is not set in environment variables");
-      }
+      // Korzystanie z klienta OpenAI do wysłania zapytania
+      const response = await openai.audio.transcriptions.create({
+        file: new File([audioBlob], "audio.mp3"),
+        model: "whisper-1",
+        response_format: "text",
+      });
 
-      const response = await fetch(
-        "https://api.openai.com/v1/audio/transcriptions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to transcribe audio");
-      }
-
-      const data: { text: string } = await response.json();
-      setTranscript(data.text);
+      setTranscript(response.text);
     } catch (error) {
       console.error("Error transcribing audio:", error);
-      setTranscript(error?.toString() as string);
+      setError(error?.toString() as string);
     }
   };
 
