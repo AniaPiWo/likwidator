@@ -74,7 +74,7 @@ export default function WhisperComponent() {
       setTranscript(data.text);
     } catch (error) {
       console.error("Error transcribing audio:", error);
-      setTranscript("Error transcribing audio. Please try again.");
+      setTranscript(error?.toString() as string);
     }
   };
 
