@@ -33,7 +33,7 @@ export const VoiceTranscription: React.FC = () => {
             type: "audio/mp3",
           });
 
-          // Wywołanie funkcji serwerowej bez API route
+          // Wywołanie funkcji do API route
           const transcriptionText = await transcribeAudio(file);
           setTranscription(transcriptionText);
         } catch (error) {

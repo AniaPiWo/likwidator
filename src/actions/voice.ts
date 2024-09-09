@@ -1,20 +1,16 @@
-"use server";
-import { vercelSDK, openai } from "@/lib/openai";
-import { z } from "zod";
-
-const audioSchema = z.object({
-  file: z.instanceof(File).describe("Audio file for transcription"),
-});
-
 export async function transcribeAudio(file: File): Promise<string> {
-  const parsed = audioSchema.parse({ file });
+  const formData = new FormData();
+  formData.append("file", file);
 
-  // Zamiast korzystania z fs.createReadStream, przekazujemy obiekt File bezpośrednio
-  const transcription = await openai.audio.transcriptions.create({
-    file: file, // Bezpośrednio przesyłamy obiekt File
-    model: "whisper-1",
-    response_format: "text",
+  const response = await fetch("/api/transcribe", {
+    method: "POST",
+    body: formData,
   });
 
-  return transcription.text;
+  if (!response.ok) {
+    throw new Error("Error during transcription");
+  }
+
+  const data = await response.json();
+  return data.transcription;
 }
