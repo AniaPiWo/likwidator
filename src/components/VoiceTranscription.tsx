@@ -37,15 +37,13 @@ export const VoiceTranscription: React.FC = () => {
           const transcriptionText = await transcribeAudio(file);
           setTranscription(transcriptionText);
         } catch (error) {
-          setError("Error during transcription. Please try again.");
+          setError(error?.toString() as string);
         }
       };
 
       mediaRecorderRef.current.start();
     } catch (error) {
-      setError(
-        "Error accessing the microphone. Please check your permissions."
-      );
+      setError(error?.toString() as string);
       setIsRecording(false);
     }
   };
