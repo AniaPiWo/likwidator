@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { CopyIcon, MicIcon } from "@/components/ui/icon";
 import { toast, Toaster } from "sonner";
 
