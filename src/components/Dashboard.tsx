@@ -4,5 +4,5 @@ import { ImagesGallery } from "./ImagesGallery";
 type Props = {};
 
 export const Dashboard = (props: Props) => {
-  return <ImagesGallery />;
+  return <p>Dashboard</p>;
 };
