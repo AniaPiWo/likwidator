@@ -2,19 +2,18 @@
 import { useState, useRef } from "react";
 import { CopyIcon, MicIcon } from "@/components/ui/icon";
 import { toast, Toaster } from "sonner";
-import { openai } from "@/lib/openai"; // Importowanie klienta OpenAI
 
 export default function WhisperComponent() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>("");
-  const [error, setError] = useState<string | null>(null); // Dodany stan błędów
+  const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   const startRecording = async () => {
-    setError(null); // Reset błędu przed każdą próbą nagrywania
+    setError(null);
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -30,7 +29,7 @@ export default function WhisperComponent() {
         const audioBlob = new Blob(audioChunksRef.current, {
           type: isSafari ? "audio/mp4" : "audio/mp3",
         });
-        sendAudioToWhisperAPI(audioBlob);
+        sendAudioToAPI(audioBlob); // wysyłamy plik audio do API route
         audioChunksRef.current = [];
       };
 
@@ -51,20 +50,22 @@ export default function WhisperComponent() {
     }
   };
 
-  const sendAudioToWhisperAPI = async (audioBlob: Blob) => {
+  const sendAudioToAPI = async (audioBlob: Blob) => {
     const formData = new FormData();
-    formData.append("file", audioBlob, "audio.mp3");
-    formData.append("model", "whisper-1");
+    formData.append("audioBlob", audioBlob);
 
     try {
-      // Korzystanie z klienta OpenAI do wysłania zapytania
-      const response = await openai.audio.transcriptions.create({
-        file: new File([audioBlob], "audio.mp3"),
-        model: "whisper-1",
-        response_format: "text",
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
       });
 
-      setTranscript(response.text);
+      if (!response.ok) {
+        throw new Error("Failed to transcribe audio");
+      }
+
+      const data = await response.json();
+      setTranscript(data.transcription);
     } catch (error) {
       console.error("Error transcribing audio:", error);
       setError(error?.toString() as string);
@@ -74,12 +75,8 @@ export default function WhisperComponent() {
   const copyTranscript = () => {
     navigator.clipboard
       .writeText(transcript)
-      .then(() => {
-        toast.success("Copied successfully!");
-      })
-      .catch((err: Error) => {
-        console.error("Failed to copy transcript: ", err);
-      });
+      .then(() => toast.success("Copied successfully!"))
+      .catch((err: Error) => console.error("Failed to copy transcript: ", err));
   };
 
   return (
@@ -95,7 +92,6 @@ export default function WhisperComponent() {
               : "Click to start recording."}
           </div>
 
-          {/* Wyświetlanie błędu jeśli mikrofon nie jest dostępny */}
           {error && <div style={{ color: "red" }}>{error}</div>}
 
           {transcript && (

@@ -1,8 +1,5 @@
 import { Landing } from "@/components/Landing";
-import { Dashboard } from "@/components/Dashboard";
 import { checkUserInDatabase } from "@/actions/user";
-import { VoiceInput } from "@/components/VoiceInput";
-import { VoiceTranscription } from "@/components/VoiceTranscription";
 import WhisperComponent from "@/components/WhisperComponent";
 
 export default async function Home() {
