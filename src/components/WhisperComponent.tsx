@@ -10,7 +10,7 @@ export default function WhisperComponent() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  //const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   const startRecording = async () => {
     setError(null);
@@ -27,13 +27,15 @@ export default function WhisperComponent() {
 
       mediaRecorderRef.current.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: isSafari ? "audio/mp4" : "audio/mp3",
+          //type: isSafari ? "audio/mp4" : "audio/mp3",
+          type: "audio/mp3",
         });
         sendAudioToAPI(audioBlob); // wysyłamy plik audio do API route
         audioChunksRef.current = [];
       };
 
-      mediaRecorderRef.current.start(isSafari ? 1000 : 0);
+      //mediaRecorderRef.current.start(isSafari ? 1000 : 0);
+      mediaRecorderRef.current.start(0);
       setIsRecording(true);
     } catch (error) {
       console.error("Error accessing microphone:", error);
