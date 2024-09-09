@@ -57,6 +57,7 @@ interface SpeechRecognitionErrorEvent extends Event {
 export const VoiceInput: React.FC = () => {
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Nowy stan dla błędów
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(
     null
   );
@@ -68,7 +69,7 @@ export const VoiceInput: React.FC = () => {
       (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      console.error("Twoja przeglądarka nie obsługuje Web Speech API");
+      setErrorMessage("Twoja przeglądarka nie obsługuje Web Speech API");
       return;
     }
 
@@ -76,17 +77,32 @@ export const VoiceInput: React.FC = () => {
     const speechRecognition = new SpeechRecognition();
     speechRecognition.lang = "pl-PL"; // Ustawienie języka na polski
     speechRecognition.continuous = false;
-    speechRecognition.interimResults = false;
+    speechRecognition.interimResults = true; // Wyniki pośrednie będą wyświetlane na bieżąco
 
     // Gdy rozpoznawanie zakończone poprawnie
     speechRecognition.onresult = (event: SpeechRecognitionEvent) => {
-      const result = event.results[0][0].transcript;
-      setTranscript(result);
+      let interimTranscript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        const result = event.results[i];
+        if (result.isFinal) {
+          setTranscript((prev) => prev + result[0].transcript);
+        } else {
+          interimTranscript += result[0].transcript;
+        }
+      }
+      setTranscript(interimTranscript); // Ustawianie tymczasowego tekstu
     };
 
     // Gdy rozpoznawanie mowy zostanie zakończone
     speechRecognition.onend = () => {
       setListening(false);
+    };
+
+    // Obsługa błędów
+    speechRecognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      setErrorMessage(
+        `Błąd rozpoznawania mowy: ${event.error}. Szczegóły: ${event.message}`
+      );
     };
 
     setRecognition(speechRecognition);
@@ -99,7 +115,9 @@ export const VoiceInput: React.FC = () => {
       recognition.stop();
       setListening(false);
     } else {
+      setErrorMessage(null); // Resetowanie błędu przy nowym nasłuchiwaniu
       recognition.start();
+      setTranscript(""); // Zresetowanie transkryptu przy rozpoczęciu nowego nasłuchiwania
       setListening(true);
     }
   };
@@ -117,6 +135,11 @@ export const VoiceInput: React.FC = () => {
           <h3>Rozpoznany tekst:</h3>
           <p>{transcript}</p>
         </>
+      )}
+      {errorMessage && (
+        <div style={{ color: "red", marginTop: "10px" }}>
+          <strong>Błąd:</strong> {errorMessage}
+        </div>
       )}
     </div>
   );
