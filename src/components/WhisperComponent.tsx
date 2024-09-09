@@ -6,12 +6,15 @@ import { toast, Toaster } from "sonner";
 export default function WhisperComponent() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>("");
+  const [error, setError] = useState<string | null>(null); // Dodany stan błędów
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   const startRecording = async () => {
+    setError(null); // Reset błędu przed każdą próbą nagrywania
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -34,6 +37,9 @@ export default function WhisperComponent() {
       setIsRecording(true);
     } catch (error) {
       console.error("Error accessing microphone:", error);
+      setError(
+        "Could not access the microphone. Please ensure you have given permission to use it."
+      );
     }
   };
 
@@ -101,6 +107,10 @@ export default function WhisperComponent() {
               ? "Recording... Click to stop."
               : "Click to start recording."}
           </div>
+
+          {/* Wyświetlanie błędu jeśli mikrofon nie jest dostępny */}
+          {error && <div style={{ color: "red" }}>{error}</div>}
+
           {transcript && (
             <div>
               <button onClick={copyTranscript}>
@@ -112,6 +122,7 @@ export default function WhisperComponent() {
           )}
         </div>
       </div>
+      <Toaster />
     </main>
   );
 }
