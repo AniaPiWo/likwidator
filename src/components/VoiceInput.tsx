@@ -135,7 +135,7 @@ export const VoiceInput: React.FC = () => {
           animation: listening ? "rotate-half 1s infinite linear" : "none",
         }}
       >
-        🎤 {listening ? "Zatrzymaj nasłuchiwanie" : <FaMicrophone />}
+        <FaMicrophone />
       </button>
       {transcript && (
         <>
