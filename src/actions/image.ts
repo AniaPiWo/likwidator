@@ -1,7 +1,6 @@
 "use server";
 import { checkUserInDatabase } from "@/actions/user";
 import { prisma } from "@/lib/prisma";
-import { get } from "http";
 
 export async function saveImageToDatabase(imageUrl: string) {
   try {

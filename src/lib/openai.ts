@@ -1,14 +1,16 @@
 import { createOpenAI } from "@ai-sdk/openai";
+import OpenAI from "openai";
+
+export const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY as string,
+});
 
 //custom Nerdbord OpenAI client
-export const openai = createOpenAI({
+export const vercelSDK = createOpenAI({
   fetch: async (url, options) => {
     const fullUrl =
       "https://training.nerdbord.io/api/v1/openai/chat/completions";
-    console.log(`Fetching ${fullUrl}`);
     const result = await fetch(fullUrl, options);
-    console.log(`Fetched ${fullUrl}`);
-    console.log();
     return result;
   },
 });
