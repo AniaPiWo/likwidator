@@ -1,24 +1,19 @@
-export async function transcribeAudio(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
+import { openai } from "@/lib/openai";
 
+export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   try {
-    const response = await fetch("/api/transcribe", {
-      method: "POST",
-      body: formData,
+    const formData = new FormData();
+    formData.append("file", audioBlob, "audio.mp3");
+
+    const response = await openai.audio.transcriptions.create({
+      file: new File([formData.get("file") as Blob], "audio.mp3"),
+      model: "whisper-1",
+      response_format: "text",
     });
 
-    if (!response.ok) {
-      // Pobierz wiadomość z błędem z odpowiedzi serwera, aby uzyskać więcej informacji
-      const errorMessage = await response.text();
-      console.error("Error response from server:", errorMessage);
-      throw new Error(`Error during transcription: ${errorMessage}`);
-    }
-
-    const data = await response.json();
-    return data.transcription;
+    return response.text;
   } catch (error) {
-    console.error(error?.toString() as string);
-    throw new Error(error?.toString() as string);
+    console.error("Failed to transcribe audio:", error);
+    throw new Error("Failed to transcribe audio");
   }
 }

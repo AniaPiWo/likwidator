@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { CopyIcon, MicIcon } from "@/components/ui/icon";
 import { toast, Toaster } from "sonner";
+import { transcribeAudio } from "@/actions/voice"; // Import funkcji transkrypcji
 
 export default function WhisperComponent() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -9,8 +10,6 @@ export default function WhisperComponent() {
   const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-
-  //const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
   const startRecording = async () => {
     setError(null);
@@ -25,16 +24,21 @@ export default function WhisperComponent() {
         }
       };
 
-      mediaRecorderRef.current.onstop = () => {
+      mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          //type: isSafari ? "audio/mp4" : "audio/mp3",
           type: "audio/mp3",
         });
-        sendAudioToAPI(audioBlob); // wysyłamy plik audio do API route
         audioChunksRef.current = [];
+
+        try {
+          const transcription = await transcribeAudio(audioBlob); // Użycie nowej funkcji
+          setTranscript(transcription);
+        } catch (error) {
+          console.error("Error during transcription:", error);
+          setError((error as Error).message);
+        }
       };
 
-      //mediaRecorderRef.current.start(isSafari ? 1000 : 0);
       mediaRecorderRef.current.start(0);
       setIsRecording(true);
     } catch (error) {
@@ -49,28 +53,6 @@ export default function WhisperComponent() {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-    }
-  };
-
-  const sendAudioToAPI = async (audioBlob: Blob) => {
-    const formData = new FormData();
-    formData.append("audioBlob", audioBlob);
-
-    try {
-      const response = await fetch("/api/transcribe", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to transcribe audio");
-      }
-
-      const data = await response.json();
-      setTranscript(data.transcription);
-    } catch (error) {
-      console.error("Error transcribing audio:", error);
-      setError(error?.toString() as string);
     }
   };
 

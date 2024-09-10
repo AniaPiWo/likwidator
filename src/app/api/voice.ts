@@ -1,7 +1,5 @@
-// pages/api/transcribe.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { openai } from "@/lib/openai"; // Import klienta OpenAI z lib/openai.ts
-
+import { openai } from "@/lib/openai";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -12,10 +10,9 @@ export default async function handler(
 
   try {
     const { audioBlob } = req.body;
-
-    // Zamiast przesyłać cały plik, musisz przesłać odpowiednie dane binarne
+    console.log("audioBlob", audioBlob);
     const response = await openai.audio.transcriptions.create({
-      file: audioBlob, // plik audio powinien być przetworzony na serwerze
+      file: audioBlob,
       model: "whisper-1",
       response_format: "text",
     });
