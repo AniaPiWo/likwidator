@@ -10,8 +10,8 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
       model: "whisper-1",
       response_format: "text",
     });
-
-    return response.text;
+    console.log("response", response);
+    return response;
   } catch (error) {
     console.error("Failed to transcribe audio:", error);
     throw new Error("Failed to transcribe audio");
