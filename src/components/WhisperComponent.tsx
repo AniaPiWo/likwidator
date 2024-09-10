@@ -62,14 +62,6 @@ export default function WhisperComponent() {
     setTranscript(e.target.value);
   };
 
-  // czy potrzebujemy kopiowania do schowka?
-  const copyTranscript = () => {
-    navigator.clipboard
-      .writeText(transcript)
-      .then(() => toast.success("Copied successfully!"))
-      .catch((err: Error) => console.error("Failed to copy transcript: ", err));
-  };
-
   return (
     <main>
       <div>
@@ -95,9 +87,6 @@ export default function WhisperComponent() {
               placeholder="Start recording by clicking on the microphone button"
             />
           )}
-          {/*      <button onClick={copyTranscript}>
-                <FaRegCopy />
-              </button> */}
         </div>
       </div>
       <Toaster />
