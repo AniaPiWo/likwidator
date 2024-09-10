@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { CopyIcon, MicIcon } from "@/components/ui/icon";
 import { toast, Toaster } from "sonner";
-import { transcribeAudio } from "@/actions/voice"; // Import funkcji transkrypcji
+import { transcribeAudio } from "@/actions/voice";
 
 export default function WhisperComponent() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -31,11 +31,11 @@ export default function WhisperComponent() {
         audioChunksRef.current = [];
 
         try {
-          const transcription = await transcribeAudio(audioBlob); // Użycie nowej funkcji
+          const transcription = await transcribeAudio(audioBlob);
           setTranscript(transcription);
         } catch (error) {
           console.error("Error during transcription:", error);
-          setError((error as Error).message);
+          setError((error as Error).toString());
         }
       };
 
@@ -54,6 +54,12 @@ export default function WhisperComponent() {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
+  };
+
+  const handleTranscriptChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setTranscript(e.target.value);
   };
 
   const copyTranscript = () => {
@@ -84,7 +90,12 @@ export default function WhisperComponent() {
                 <CopyIcon />
                 Copy
               </button>
-              <p>{transcript}</p>
+              <textarea
+                value={transcript}
+                onChange={handleTranscriptChange}
+                rows={5}
+                cols={50}
+              />
             </div>
           )}
         </div>
