@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef } from "react";
-import { CopyIcon, MicIcon } from "@/components/ui/icon";
 import { toast, Toaster } from "sonner";
 import { transcribeAudio } from "@/actions/voice";
+import { FaRegCopy, FaMicrophone, FaRegCircleStop } from "react-icons/fa6";
 
 export default function WhisperComponent() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -62,6 +62,7 @@ export default function WhisperComponent() {
     setTranscript(e.target.value);
   };
 
+  // czy potrzebujemy kopiowania do schowka?
   const copyTranscript = () => {
     navigator.clipboard
       .writeText(transcript)
@@ -72,32 +73,31 @@ export default function WhisperComponent() {
   return (
     <main>
       <div>
-        <div>
+        <div className="flex gap-4">
           <button onClick={isRecording ? stopRecording : startRecording}>
-            {isRecording ? "Stop" : "Record"}
+            {isRecording ? <FaRegCircleStop /> : <FaMicrophone />}
           </button>
-          <div>
-            {isRecording
-              ? "Recording... Click to stop."
-              : "Click to start recording."}
-          </div>
-
-          {error && <div style={{ color: "red" }}>{error}</div>}
-
-          {transcript && (
-            <div>
-              <button onClick={copyTranscript}>
-                <CopyIcon />
-                Copy
-              </button>
-              <textarea
-                value={transcript}
-                onChange={handleTranscriptChange}
-                rows={5}
-                cols={50}
-              />
-            </div>
+          {error ? (
+            <div style={{ color: "red" }}>{error}</div>
+          ) : (
+            <textarea
+              style={{
+                backgroundColor: "inherit",
+                color: "inherit",
+                height: "100px",
+                border: "1px solid white",
+                padding: "10px",
+              }}
+              value={transcript}
+              onChange={handleTranscriptChange}
+              rows={5}
+              cols={50}
+              placeholder="Start recording by clicking on the microphone button"
+            />
           )}
+          {/*      <button onClick={copyTranscript}>
+                <FaRegCopy />
+              </button> */}
         </div>
       </div>
       <Toaster />

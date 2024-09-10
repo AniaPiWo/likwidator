@@ -86,7 +86,7 @@ export const CapturePic = (props: Props) => {
   const handleCancel = () => {
     setImage(null);
     setMsg(null);
-    startCamera(); // Restart the camera when cancelling
+    startCamera();
   };
 
   return (
