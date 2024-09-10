@@ -31,3 +31,11 @@ body {
     text-wrap: balance;
   }
 }
+
+select,
+textarea,
+input,
+button {
+  color: inherit;
+  background-color: inherit;
+}
