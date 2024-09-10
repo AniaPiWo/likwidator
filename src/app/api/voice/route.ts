@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       language: "pl",
       response_format: "text",
     });
-
+    console.log("RESPONSE IN ROUTE =>", response);
     return NextResponse.json({ transcription: response.text });
   } catch (error) {
     console.error("Failed to transcribe audio:", error);
