@@ -1,12 +1,20 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { openai } from "@/lib/openai"; // Import OpenAI API client
+import { openai } from "@/lib/openai";
+import { Uploadable } from "openai/uploads.mjs";
 
 export async function POST(req: NextRequest) {
   try {
-    const file = await req.blob(); // Zmiana na pobieranie blob z requestu
+    const formData = await req.formData();
+    const file = formData.get("audioBlob");
+    console.log("FILE IN ROUTE =>", file);
+    console.log("FILE IN ROUTE =>", typeof file);
+    if (!file) {
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
     const response = await openai.audio.transcriptions.create({
-      file: new File([file], "audio.mp3"),
+      file: file as Uploadable,
       model: "whisper-1",
       language: "pl",
       response_format: "text",
