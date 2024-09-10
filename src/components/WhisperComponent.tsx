@@ -55,9 +55,6 @@ export default function WhisperComponent({
         <form className="flex flex-col gap-4 justify-center w-1/2 relative">
           {/* Select dropdown for labels */}
           <div className="mt-4">
-            <label className="text-sm font-medium text-gray-900 dark:text-white">
-              Select a Label:{" "}
-            </label>
             <select
               value={selectedLabel}
               onChange={handleLabelChange}
@@ -88,15 +85,17 @@ export default function WhisperComponent({
             </div>
           )}
 
-          {/* Dynamically resizable textarea with microphone icon */}
+          {/* Dynamically resizable textarea */}
           <div className="relative">
             <textarea
+              rows={2}
               ref={textareaRef}
-              className="relative w-full p-2 pl-14 border border-white resize-none overflow-hidden"
+              className="relative w-full p-2 pl-14 border border-white resize-none overflow-hidden flex items-center justify-center h-full"
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
               placeholder="Start recording by clicking on the microphone button"
             />
+
             <button
               type="button"
               className="absolute p-2 left-3 top-8 transform -translate-y-1/2 text-gray-500 "
