@@ -10,7 +10,7 @@ export default async function handler(
   }
 
   try {
-    const file = req.body; // Zakładamy, że audioBlob jest przekazywany w body
+    const file = req.body;
     const response = await openai.audio.transcriptions.create({
       file: new File([file], "audio.mp3"),
       model: "whisper-1",
