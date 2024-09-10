@@ -1,16 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { openai } from "@/lib/openai"; // Import OpenAI API client
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    const file = req.body;
+    const file = await req.blob(); // Zmiana na pobieranie blob z requestu
     const response = await openai.audio.transcriptions.create({
       file: new File([file], "audio.mp3"),
       model: "whisper-1",
@@ -18,9 +12,12 @@ export default async function handler(
       response_format: "text",
     });
 
-    res.status(200).json({ transcription: response.text });
+    return NextResponse.json({ transcription: response.text });
   } catch (error) {
     console.error("Failed to transcribe audio:", error);
-    res.status(500).json({ error: "Failed to transcribe audio" });
+    return NextResponse.json(
+      { error: "Failed to transcribe audio" },
+      { status: 500 }
+    );
   }
 }
