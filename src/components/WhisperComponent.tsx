@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { FaMicrophone, FaRegCircleStop } from "react-icons/fa6";
-
+import { transcribeAudio } from "@/actions/voice";
 type WhisperComponentProps = {
   data: {
     id: number;
@@ -21,8 +21,12 @@ export default function WhisperComponent({
   const [selectedLabel, setSelectedLabel] = useState<string>(
     data.selectedLabel
   );
+  const [error, setError] = useState<string | null>(null);
   const [customLabel, setCustomLabel] = useState<string>(
     data.customLabel || ""
+  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
   );
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -30,15 +34,15 @@ export default function WhisperComponent({
   const labels = ["Label 1", "Label 2", "Label 3", "Label 4", "Custom Label"];
 
   useEffect(() => {
-    // Every time the state changes, pass the data up to the parent
+    // Pass the data up to the parent whenever state changes
     onChange(data.id, { transcript, selectedLabel, customLabel });
   }, [transcript, selectedLabel, customLabel]);
 
-  // Dynamically resize the textarea based on its content
   useEffect(() => {
+    // Dynamically resize the textarea based on its content
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reset the height
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set new height
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [transcript]);
 
@@ -46,6 +50,41 @@ export default function WhisperComponent({
     setSelectedLabel(e.target.value);
     if (e.target.value !== "Custom Label") {
       setCustomLabel("");
+    }
+  };
+
+  const handleRecording = async () => {
+    if (isRecording) {
+      mediaRecorder?.stop();
+      setIsRecording(false);
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        const newMediaRecorder = new MediaRecorder(stream);
+        setMediaRecorder(newMediaRecorder);
+
+        const chunks: Blob[] = [];
+        newMediaRecorder.ondataavailable = (event) => {
+          chunks.push(event.data);
+        };
+
+        newMediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(chunks, { type: "audio/wav" });
+          try {
+            const transcription = await transcribeAudio(audioBlob);
+            setTranscript(transcription); // Set the transcribed text
+          } catch (error) {
+            setError("Transcription failed: " + error);
+          }
+        };
+
+        newMediaRecorder.start();
+        setIsRecording(true);
+      } catch (error) {
+        setError("Failed to access microphone: " + error);
+      }
     }
   };
 
@@ -68,7 +107,6 @@ export default function WhisperComponent({
               ))}
             </select>
           </div>
-
           {/* Input field for custom label */}
           {selectedLabel === "Custom Label" && (
             <div className="mt-4">
@@ -84,7 +122,7 @@ export default function WhisperComponent({
               />
             </div>
           )}
-
+          {error && <p className="text-red-500">{error}</p>}
           {/* Dynamically resizable textarea */}
           <div className="relative">
             <textarea
@@ -99,7 +137,7 @@ export default function WhisperComponent({
             <button
               type="button"
               className="absolute p-2 left-3 top-8 transform -translate-y-1/2 text-gray-500 "
-              onClick={() => setIsRecording(!isRecording)}
+              onClick={handleRecording}
             >
               {isRecording ? (
                 <FaRegCircleStop className="text-red-500" />
