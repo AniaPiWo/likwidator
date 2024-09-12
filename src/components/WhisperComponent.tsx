@@ -18,6 +18,7 @@ export default function WhisperComponent({
 }: WhisperComponentProps) {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>(data.transcript);
+  const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
   const [selectedLabel, setSelectedLabel] = useState<string>(
     data.selectedLabel
   );
@@ -71,10 +72,12 @@ export default function WhisperComponent({
         };
 
         newMediaRecorder.onstop = async () => {
+          setIsTranscribing(true);
           const audioBlob = new Blob(chunks, { type: "audio/wav" });
           try {
             const transcription = await transcribeAudio(audioBlob);
-            setTranscript(transcription); // Set the transcribed text
+            setIsTranscribing(false);
+            setTranscript(transcription);
           } catch (error) {
             setError("Transcription failed: " + error);
           }
@@ -131,7 +134,11 @@ export default function WhisperComponent({
               className="relative w-full p-2 pl-14 border border-white resize-none overflow-hidden flex items-center justify-center h-full"
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
-              placeholder="Start recording by clicking on the microphone button"
+              placeholder={
+                isTranscribing
+                  ? "Transcribing..."
+                  : "Start recording by clicking on the microphone button"
+              }
             />
 
             <button
