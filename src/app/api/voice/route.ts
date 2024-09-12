@@ -7,8 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("audioBlob");
-    console.log("FILE IN ROUTE =>", file);
-    console.log("FILE IN ROUTE =>", typeof file);
+
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
       language: "pl",
       response_format: "text",
     });
-    console.log("RESPONSE IN ROUTE =>", response);
+
     return NextResponse.json({ transcription: response });
   } catch (error) {
     console.error("Failed to transcribe audio:", error);

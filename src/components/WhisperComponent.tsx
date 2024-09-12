@@ -57,7 +57,6 @@ export default function WhisperComponent({
   const handleRecording = async () => {
     if (isRecording) {
       mediaRecorder?.stop();
-      setIsRecording(false);
     } else {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -94,7 +93,7 @@ export default function WhisperComponent({
   return (
     <main>
       <div className="flex gap-4 justify-center">
-        <form className="flex flex-col gap-4 justify-center w-1/2 relative">
+        <form className="flex flex-col gap-4 justify-center w-full md:w-1/2 p-4  relative">
           {/* Select dropdown for labels */}
           <div className="mt-4">
             <select
@@ -135,7 +134,9 @@ export default function WhisperComponent({
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
               placeholder={
-                isTranscribing
+                isRecording
+                  ? "Listening..."
+                  : isTranscribing
                   ? "Transcribing..."
                   : "Start recording by clicking on the microphone button"
               }
