@@ -57,6 +57,7 @@ export default function WhisperComponent({
   const handleRecording = async () => {
     if (isRecording) {
       mediaRecorder?.stop();
+setIsRecording(false)
     } else {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
