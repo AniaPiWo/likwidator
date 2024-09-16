@@ -1,7 +1,6 @@
 import { Landing } from "@/components/Landing";
 import { checkUserInDatabase } from "@/actions/user";
 import WhisperComponent from "@/components/WhisperComponent";
-import { BuildingPlan } from "@/components/BuildingPlan";
 import { Dashboard } from "@/components/Dashboard";
 
 export default async function Home() {

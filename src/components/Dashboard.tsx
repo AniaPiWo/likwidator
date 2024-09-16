@@ -1,14 +1,10 @@
 import React from "react";
 import { ImagesGallery } from "./ImagesGallery";
 import Link from "next/link";
-import { BuildingForm } from "./BuildingForm";
+import { DrawingCanvas } from "./DrawingCanvas";
 
 type Props = {};
 
 export const Dashboard = (props: Props) => {
-  return (
-    <div>
-      <BuildingForm />
-    </div>
-  );
+  return <DrawingCanvas />;
 };
