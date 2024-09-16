@@ -12,7 +12,8 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.50",
     "@clerk/nextjs": "^5.3.2",
-    "@prisma/client": "^5.18.0",
+    "@prisma/client": "^5.19.1",
+    "fabric": "^6.4.2",
     "formidable": "^3.5.1",
     "fs": "^0.0.1-security",
     "next": "14.2.5",
