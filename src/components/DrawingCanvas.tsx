@@ -130,7 +130,10 @@ export const DrawingCanvas = (props: Props) => {
       enableObjectSelection();
     });
 
+    window.addEventListener("resize", resizeCanvas);
+
     return () => {
+      window.removeEventListener("resize", resizeCanvas);
       fabricCanvas.dispose();
     };
   }, []);
