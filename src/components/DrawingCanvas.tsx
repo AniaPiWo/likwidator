@@ -226,8 +226,8 @@ export const DrawingCanvas = (props: Props) => {
   };
 
   return (
-    <div className="container flex flex-col items-center gap-2">
-      <div className="buttonbox flex gap-2">
+    <div className="container flex flex-col items-center gap-2 p-4 border-b">
+      <div className="buttonbox flex justify-start gap-2">
         <button className="btn btn-primary" onClick={handleAddRectangle}>
           <BiRectangle />
         </button>

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { DrawingCanvas } from "./DrawingCanvas";
 
 interface FormData {
   budynekTyp: string;
@@ -176,7 +177,14 @@ export const BuildingForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-b p-4">Szkic budynku</div>
+        <div className="flex flex-col md:flex-row">
+          <div className="border-r w-full md:w-32 font-semibold bg-neutral border-b p-4">
+            <p>Szkic budynku</p>
+          </div>
+          <div className="w-full">
+            <DrawingCanvas />
+          </div>
+        </div>
 
         <div className="flex flex-col md:flex-row">
           <div className="border-r w-full md:w-32 font-semibold bg-neutral border-b p-4">
