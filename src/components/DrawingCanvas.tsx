@@ -13,10 +13,26 @@ export const DrawingCanvas = (props: Props) => {
   const [textInput, setTextInput] = useState<string>("");
 
   useEffect(() => {
-    const fabricCanvas = new fabric.Canvas(canvasRef.current!, {
+    if (!canvasRef.current) return;
+
+    const resizeCanvas = () => {
+      if (canvasRef.current && canvas) {
+        // Ustawienie szerokości i wysokości płótna na podstawie rodzica
+        const parent = canvasRef.current.parentElement;
+        if (parent) {
+          canvas.setWidth(parent.clientWidth);
+          canvas.setHeight(parent.clientHeight);
+          canvas.renderAll();
+        }
+      }
+    };
+
+    // Tworzenie płótna z początkowymi wymiarami rodzica
+    const parent = canvasRef.current.parentElement;
+    const fabricCanvas = new fabric.Canvas(canvasRef.current, {
       backgroundColor: "#f3f3f3",
-      height: 500,
-      width: 1000,
+      height: parent ? parent.clientHeight : 1000,
+      width: parent ? parent.clientWidth : 1000,
     });
 
     setCanvas(fabricCanvas);
