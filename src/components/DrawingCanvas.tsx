@@ -45,6 +45,22 @@ export const DrawingCanvas = (props: Props) => {
     let points: { x: number; y: number }[] = [];
     let activePath: fabric.Path | null = null; // Track the active path
 
+    // Helper function to disable object selection
+    const disableObjectSelection = () => {
+      fabricCanvas.selection = false;
+      fabricCanvas.forEachObject((obj) => {
+        obj.selectable = false;
+      });
+    };
+
+    // Helper function to enable object selection
+    const enableObjectSelection = () => {
+      fabricCanvas.selection = true;
+      fabricCanvas.forEachObject((obj) => {
+        obj.selectable = true;
+      });
+    };
+
     // Start drawing
     fabricCanvas.on("mouse:down", (options) => {
       // If an object is selected, don't start drawing
@@ -57,6 +73,9 @@ export const DrawingCanvas = (props: Props) => {
       points = [];
       const pointer = fabricCanvas.getPointer(options.e);
       points.push({ x: pointer.x, y: pointer.y });
+
+      // Disable object selection during drawing
+      disableObjectSelection();
     });
 
     // Continue drawing
@@ -90,7 +109,9 @@ export const DrawingCanvas = (props: Props) => {
       isDrawing = false;
       points = [];
       activePath = null;
-      fabricCanvas.selection = true;
+
+      // Re-enable object selection
+      enableObjectSelection();
     });
 
     return () => {
@@ -152,7 +173,18 @@ export const DrawingCanvas = (props: Props) => {
     }
   };
 
-  const handleAddPath = () => {
+  const handleAddDashedLine = () => {
+    if (canvas) {
+      const dashedLine = new fabric.Line([50, 50, 200, 200], {
+        stroke: "black",
+        strokeWidth: 2,
+        strokeDashArray: [10, 5],
+      });
+      canvas.add(dashedLine);
+    }
+  };
+
+  /*   const handleAddPath = () => {
     if (canvas) {
       const path = new fabric.Path("M 0 0 L 100 100", {
         stroke: "black",
@@ -160,7 +192,7 @@ export const DrawingCanvas = (props: Props) => {
       });
       canvas.add(path);
     }
-  };
+  }; */
 
   const handleAddText = () => {
     if (canvas && textInput.trim()) {
@@ -175,6 +207,21 @@ export const DrawingCanvas = (props: Props) => {
       canvas.add(text);
       canvas.setActiveObject(text);
       setTextInput("");
+    }
+  };
+
+  const handleClearCanvas = () => {
+    if (canvas) {
+      canvas.clear();
+      canvas.backgroundColor = "#f3f3f3";
+      canvas.renderAll();
+    }
+  };
+
+  const handleSaveCanvas = () => {
+    if (canvas) {
+      const canvasData = canvas.toJSON();
+      console.log("Canvas JSON data:", canvasData);
     }
   };
 
@@ -193,9 +240,10 @@ export const DrawingCanvas = (props: Props) => {
         <button className="btn btn-primary" onClick={handleAddLine}>
           <IoRemoveOutline />
         </button>
-        <button className="btn btn-primary" onClick={handleAddPath}>
-          Add Path
+        <button className="btn btn-primary" onClick={handleAddDashedLine}>
+          przerywana linia
         </button>
+
         <div className="flex gap-2">
           <input
             type="text"
@@ -206,6 +254,12 @@ export const DrawingCanvas = (props: Props) => {
           />
           <button className="btn btn-primary" onClick={handleAddText}>
             T
+          </button>
+          <button className="btn btn-primary" onClick={handleClearCanvas}>
+            Clear
+          </button>
+          <button className="btn btn-primary" onClick={handleSaveCanvas}>
+            Save
           </button>
         </div>
       </div>
