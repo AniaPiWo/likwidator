@@ -25,3 +25,13 @@ button {
   color: inherit;
   background-color: inherit;
 }
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.canvas-container {
+  width: 100% !important;
+  height: 100% !important;
+}

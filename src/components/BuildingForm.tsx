@@ -181,7 +181,7 @@ export const BuildingForm: React.FC = () => {
           <div className="border-r w-full md:w-32 font-semibold bg-neutral border-b p-4">
             <p>Szkic budynku</p>
           </div>
-          <div className="w-full">
+          <div className="w-full flex flex-col items-center border-b p-4">
             <DrawingCanvas />
           </div>
         </div>

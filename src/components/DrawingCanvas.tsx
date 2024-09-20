@@ -12,28 +12,26 @@ export const DrawingCanvas = (props: Props) => {
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [textInput, setTextInput] = useState<string>("");
 
+  // Initialize the canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const resizeCanvas = () => {
-      if (canvasRef.current && canvas) {
-        // Ustawienie szerokości i wysokości płótna na podstawie rodzica
-        const parent = canvasRef.current.parentElement;
-        if (parent) {
-          canvas.setWidth(parent.clientWidth);
-          canvas.setHeight(parent.clientHeight);
-          canvas.renderAll();
-        }
-      }
-    };
-
-    // Tworzenie płótna z początkowymi wymiarami rodzica
-    const parent = canvasRef.current.parentElement;
     const fabricCanvas = new fabric.Canvas(canvasRef.current, {
       backgroundColor: "#f3f3f3",
-      height: parent ? parent.clientHeight : 1000,
-      width: parent ? parent.clientWidth : 1000,
     });
+
+    // Function to resize canvas to 100% width and height of its parent
+    function resizeCanvas() {
+      const parent = canvasRef.current?.parentNode;
+      if (!parent) return;
+      const parentElement = parent as HTMLElement;
+      fabricCanvas.setWidth(parentElement.clientWidth);
+      fabricCanvas.setHeight(parentElement.clientHeight);
+      fabricCanvas.renderAll();
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
     setCanvas(fabricCanvas);
 
@@ -129,8 +127,6 @@ export const DrawingCanvas = (props: Props) => {
       // Re-enable object selection
       enableObjectSelection();
     });
-
-    window.addEventListener("resize", resizeCanvas);
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
@@ -241,29 +237,41 @@ export const DrawingCanvas = (props: Props) => {
     if (canvas) {
       const canvasData = canvas.toJSON();
       console.log("Canvas JSON data:", canvasData);
+
+      // Kopiowanie canvasData do schowka
+      const canvasDataString = JSON.stringify(canvasData);
+      navigator.clipboard
+        .writeText(canvasDataString)
+        .then(() => {
+          console.log("Canvas data copied to clipboard");
+        })
+        .catch((err) => {
+          console.error("Failed to copy canvas data to clipboard:", err);
+        });
     }
   };
 
   return (
-    <div className="container flex flex-col items-center gap-2 p-4 border-b">
-      <div className="buttonbox flex justify-start gap-2">
-        <button className="btn btn-primary" onClick={handleAddRectangle}>
-          <BiRectangle />
-        </button>
-        <button className="btn btn-primary" onClick={handleAddCircle}>
-          <FaRegCircle />
-        </button>
-        <button className="btn btn-primary" onClick={handleAddTriangle}>
-          <IoTriangleOutline />
-        </button>
-        <button className="btn btn-primary" onClick={handleAddLine}>
-          <IoRemoveOutline />
-        </button>
-        <button className="btn btn-primary" onClick={handleAddDashedLine}>
-          przerywana linia
-        </button>
-
-        <div className="flex gap-2">
+    <div className="container flex flex-col justify-center gap-2  w-full h-full ">
+      <div className="flex flex-col gap-2 sm:flex-row flex-wrap justify-start sm:justify-center">
+        <div className="flex sm:flex-row items-start justify-start gap-2  ">
+          <button className="btn btn-primary" onClick={handleAddRectangle}>
+            <BiRectangle />
+          </button>
+          <button className="btn btn-primary" onClick={handleAddCircle}>
+            <FaRegCircle />
+          </button>
+          <button className="btn btn-primary" onClick={handleAddTriangle}>
+            <IoTriangleOutline />
+          </button>
+          <button className="btn btn-primary" onClick={handleAddLine}>
+            <IoRemoveOutline />
+          </button>
+          <button className="btn btn-primary" onClick={handleAddDashedLine}>
+            - -
+          </button>
+        </div>
+        <div className="flex  gap-2">
           <input
             type="text"
             value={textInput}
@@ -274,6 +282,9 @@ export const DrawingCanvas = (props: Props) => {
           <button className="btn btn-primary" onClick={handleAddText}>
             T
           </button>
+        </div>
+
+        <div className="flex gap-2 ">
           <button className="btn btn-primary" onClick={handleClearCanvas}>
             Clear
           </button>
@@ -282,8 +293,9 @@ export const DrawingCanvas = (props: Props) => {
           </button>
         </div>
       </div>
-
-      <canvas ref={canvasRef} />
+      <div className="w-full h-96">
+        <canvas className="w-full h-full" ref={canvasRef} />
+      </div>
     </div>
   );
 };
