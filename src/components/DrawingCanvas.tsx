@@ -4,16 +4,13 @@ import * as fabric from "fabric";
 import { IoTriangleOutline, IoRemoveOutline } from "react-icons/io5";
 import { BiRectangle } from "react-icons/bi";
 import { FaRegCircle } from "react-icons/fa";
-import { GiDoor, GiWindow } from "react-icons/gi"; // Import icons for door and window buttons
-
+import { PiDoorThin } from "react-icons/pi";
 type Props = {};
 
 export const DrawingCanvas = (props: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [textInput, setTextInput] = useState<string>("");
-  const [brushSize, setBrushSize] = useState<number>(5);
-  const [brushColor, setBrushColor] = useState<string>("black");
   const [isHighlightBrushActive, setIsHighlightBrushActive] = useState(false);
 
   // Initialize the canvas
@@ -247,6 +244,12 @@ export const DrawingCanvas = (props: Props) => {
     }
   };
 
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Delete" || event.key === "Del") {
+      handleDeleteSelectedObject();
+    }
+  });
+
   const handleClearCanvas = () => {
     if (canvas) {
       canvas.clear();
@@ -277,13 +280,13 @@ export const DrawingCanvas = (props: Props) => {
   const handleAddDoor = () => {
     if (canvas) {
       const doorPath = new fabric.Path(
-        "M 0 0 L 0 50 A 50 50 0 0 1 50 100 L 0 100 Z", // Custom path data for a door symbol
+        "M 30 30 L 30 70 M 30 70 A 40 40 0 0 0 70 30",
         {
           left: 100,
           top: 100,
           fill: "transparent",
           stroke: "black",
-          strokeWidth: 2,
+          strokeWidth: 1,
         }
       );
       canvas.add(doorPath);
@@ -294,13 +297,14 @@ export const DrawingCanvas = (props: Props) => {
   const handleAddWindow = () => {
     if (canvas) {
       const windowPath = new fabric.Path(
-        "M 0 0 L 100 0 L 100 100 L 0 100 Z M 0 50 L 100 50 M 50 0 L 50 100", // Custom path data for a window symbol
+        "M 30 30 L 30 70 M 30 70 A 40 40 0 0 0 70 30",
         {
           left: 200,
           top: 200,
           fill: "transparent",
           stroke: "black",
-          strokeWidth: 2,
+          strokeWidth: 1,
+          strokeDashArray: [5, 5], // Dashed line
         }
       );
       canvas.add(windowPath);
@@ -328,10 +332,10 @@ export const DrawingCanvas = (props: Props) => {
               - -
             </button>
             <button className="btn btn-primary" onClick={handleAddDoor}>
-              <GiDoor /> {/* Door icon button */}
+              Drzwi
             </button>
             <button className="btn btn-primary" onClick={handleAddWindow}>
-              <GiWindow /> {/* Window icon button */}
+              Okno
             </button>
           </div>
           <div className="flex gap-2">
