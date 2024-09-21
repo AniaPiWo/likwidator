@@ -4,6 +4,7 @@ import * as fabric from "fabric";
 import { IoTriangleOutline, IoRemoveOutline } from "react-icons/io5";
 import { BiRectangle } from "react-icons/bi";
 import { FaRegCircle } from "react-icons/fa";
+import { GiDoor, GiWindow } from "react-icons/gi"; // Import icons for door and window buttons
 
 type Props = {};
 
@@ -11,6 +12,9 @@ export const DrawingCanvas = (props: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
   const [textInput, setTextInput] = useState<string>("");
+  const [brushSize, setBrushSize] = useState<number>(5);
+  const [brushColor, setBrushColor] = useState<string>("black");
+  const [isHighlightBrushActive, setIsHighlightBrushActive] = useState(false);
 
   // Initialize the canvas
   useEffect(() => {
@@ -45,6 +49,9 @@ export const DrawingCanvas = (props: Props) => {
     });
     fabricCanvas.add(placeholderText);
 
+    // Disable free drawing mode initially
+    fabricCanvas.isDrawingMode = false;
+
     // Allow editing text directly by double-clicking on the text object
     fabricCanvas.on("mouse:dblclick", (options) => {
       if (options.target && options.target.type === "text") {
@@ -77,6 +84,8 @@ export const DrawingCanvas = (props: Props) => {
 
     // Start drawing
     fabricCanvas.on("mouse:down", (options) => {
+      if (fabricCanvas.isDrawingMode) return; // Do not use path drawing if in drawing mode
+
       // If an object is selected, don't start drawing
       if (options.target) {
         isDrawing = false;
@@ -94,7 +103,7 @@ export const DrawingCanvas = (props: Props) => {
 
     // Continue drawing
     fabricCanvas.on("mouse:move", (options) => {
-      if (!isDrawing) return;
+      if (!isDrawing || fabricCanvas.isDrawingMode) return;
       const pointer = fabricCanvas.getPointer(options.e);
       points.push({ x: pointer.x, y: pointer.y });
       const pathData =
@@ -199,16 +208,6 @@ export const DrawingCanvas = (props: Props) => {
     }
   };
 
-  /*   const handleAddPath = () => {
-    if (canvas) {
-      const path = new fabric.Path("M 0 0 L 100 100", {
-        stroke: "black",
-        strokeWidth: 1,
-      });
-      canvas.add(path);
-    }
-  }; */
-
   const handleAddText = () => {
     if (canvas && textInput.trim()) {
       const text = new fabric.IText(textInput, {
@@ -222,6 +221,29 @@ export const DrawingCanvas = (props: Props) => {
       canvas.add(text);
       canvas.setActiveObject(text);
       setTextInput("");
+    }
+  };
+
+  const handleActivateHighlightBrush = () => {
+    if (canvas) {
+      const highlightBrush = new fabric.PencilBrush(canvas);
+      highlightBrush.color = "rgba(255, 0, 0, 0.3)"; // Red with 30% opacity
+      highlightBrush.width = 30; // Brush size
+
+      canvas.isDrawingMode = !canvas.isDrawingMode;
+      canvas.freeDrawingBrush = highlightBrush;
+      setIsHighlightBrushActive(canvas.isDrawingMode);
+    }
+  };
+
+  const handleDeleteSelectedObject = () => {
+    if (canvas) {
+      const activeObject = canvas.getActiveObject();
+      if (activeObject) {
+        canvas.remove(activeObject);
+        canvas.discardActiveObject();
+        canvas.renderAll();
+      }
     }
   };
 
@@ -251,45 +273,102 @@ export const DrawingCanvas = (props: Props) => {
     }
   };
 
+  // Function to add a door symbol to the canvas
+  const handleAddDoor = () => {
+    if (canvas) {
+      const doorPath = new fabric.Path(
+        "M 0 0 L 0 50 A 50 50 0 0 1 50 100 L 0 100 Z", // Custom path data for a door symbol
+        {
+          left: 100,
+          top: 100,
+          fill: "transparent",
+          stroke: "black",
+          strokeWidth: 2,
+        }
+      );
+      canvas.add(doorPath);
+    }
+  };
+
+  // Function to add a window symbol to the canvas
+  const handleAddWindow = () => {
+    if (canvas) {
+      const windowPath = new fabric.Path(
+        "M 0 0 L 100 0 L 100 100 L 0 100 Z M 0 50 L 100 50 M 50 0 L 50 100", // Custom path data for a window symbol
+        {
+          left: 200,
+          top: 200,
+          fill: "transparent",
+          stroke: "black",
+          strokeWidth: 2,
+        }
+      );
+      canvas.add(windowPath);
+    }
+  };
+
   return (
     <div className="container flex flex-col justify-center gap-2  w-full h-full ">
-      <div className="flex flex-col gap-2 sm:flex-row flex-wrap justify-start sm:justify-center">
-        <div className="flex sm:flex-row items-start justify-start gap-2  ">
-          <button className="btn btn-primary" onClick={handleAddRectangle}>
-            <BiRectangle />
-          </button>
-          <button className="btn btn-primary" onClick={handleAddCircle}>
-            <FaRegCircle />
-          </button>
-          <button className="btn btn-primary" onClick={handleAddTriangle}>
-            <IoTriangleOutline />
-          </button>
-          <button className="btn btn-primary" onClick={handleAddLine}>
-            <IoRemoveOutline />
-          </button>
-          <button className="btn btn-primary" onClick={handleAddDashedLine}>
-            - -
-          </button>
-        </div>
-        <div className="flex  gap-2">
-          <input
-            type="text"
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-            placeholder="Enter text here"
-            className="input input-bordered"
-          />
-          <button className="btn btn-primary" onClick={handleAddText}>
-            T
-          </button>
+      <div className="flex flex-col gap-2 sm:flex-row flex-wrap justify-start sm:justify-between">
+        <div className="flex gap-4">
+          <div className="flex sm:flex-row items-start justify-start gap-2 ">
+            <button className="btn btn-primary" onClick={handleAddRectangle}>
+              <BiRectangle />
+            </button>
+            <button className="btn btn-primary" onClick={handleAddCircle}>
+              <FaRegCircle />
+            </button>
+            <button className="btn btn-primary" onClick={handleAddTriangle}>
+              <IoTriangleOutline />
+            </button>
+            <button className="btn btn-primary" onClick={handleAddLine}>
+              <IoRemoveOutline />
+            </button>
+            <button className="btn btn-primary" onClick={handleAddDashedLine}>
+              - -
+            </button>
+            <button className="btn btn-primary" onClick={handleAddDoor}>
+              <GiDoor /> {/* Door icon button */}
+            </button>
+            <button className="btn btn-primary" onClick={handleAddWindow}>
+              <GiWindow /> {/* Window icon button */}
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              placeholder="Enter text here"
+              className="input input-bordered"
+            />
+            <button className="btn btn-primary" onClick={handleAddText}>
+              T
+            </button>
+            <button
+              className={`btn btn-primary ${
+                isHighlightBrushActive ? "btn-active" : ""
+              }`}
+              onClick={handleActivateHighlightBrush}
+            >
+              {isHighlightBrushActive ? "Szkoda" : "Ołówek"}
+            </button>
+
+            <button
+              className="btn btn-primary"
+              onClick={handleDeleteSelectedObject}
+            >
+              Usuń
+            </button>
+          </div>
         </div>
 
-        <div className="flex gap-2 ">
+        <div className="flex gap-2">
           <button className="btn btn-primary" onClick={handleClearCanvas}>
-            Clear
+            Wyczyść
           </button>
           <button className="btn btn-primary" onClick={handleSaveCanvas}>
-            Save
+            Zapisz
           </button>
         </div>
       </div>

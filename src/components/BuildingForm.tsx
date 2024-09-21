@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { DrawingCanvas } from "./DrawingCanvas";
 
 interface FormData {
+  dataSporzadzeniaProtokolu: string;
+  numerSzkody: string;
   budynekTyp: string;
   wymiaryDlSzer: string;
   wymiaryWys: string;
@@ -27,7 +29,11 @@ interface FormData {
 }
 
 export const BuildingForm: React.FC = () => {
+  const todayDate = new Date().toISOString().split("T")[0];
+
   const [formData, setFormData] = useState<FormData>({
+    dataSporzadzeniaProtokolu: todayDate,
+    numerSzkody: "",
     budynekTyp: "",
     wymiaryDlSzer: "",
     wymiaryWys: "",
@@ -77,20 +83,35 @@ export const BuildingForm: React.FC = () => {
       <h2 className="text-2xl font-bold">Załącznik do protokułu szkody</h2>
       <p>Dotyczy szkody na nieruchomości</p>
       <form className="m-4 w-full border" onSubmit={handleSubmit}>
-        <div className="form-control w-full border-b p-4">
-          <label className="label">
-            <span className="label-text">Budynek, typ:</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Wpisz typ budynku"
-            className="input input-bordered w-full"
-            name="budynekTyp"
-            value={formData.budynekTyp}
-            onChange={handleInputChange}
-          />
-        </div>
+        <div className="form-control flex flex-row w-full border-b p-4 gap-4">
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Data sporządzenia protokołu: </span>
+            </label>
+            <input
+              type="date"
+              placeholder="Wpisz typ budynku"
+              className="input input-bordered w-full"
+              name="dataSporzadzeniaProtokolu"
+              value={formData.dataSporzadzeniaProtokolu}
+              onChange={handleInputChange}
+            />
+          </div>
 
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Szkoda nr:</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Wpisz numer szkody"
+              className="input input-bordered w-full"
+              name="numerSzkody"
+              value={formData.numerSzkody}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 space-y-4 border-b p-4 pt-0">
           <div className="form-control mt-4">
             <label className="label">
