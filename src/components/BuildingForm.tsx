@@ -80,7 +80,7 @@ export const BuildingForm: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-4">
-      <h2 className="text-2xl font-bold">Załącznik do protokułu szkody</h2>
+      <h2 className="text-2xl font-bold">Załącznik do protokołu szkody</h2>
       <p>Dotyczy szkody na nieruchomości</p>
       <form className="m-4 w-full border" onSubmit={handleSubmit}>
         <div className="form-control flex flex-row w-full border-b p-4 gap-4">

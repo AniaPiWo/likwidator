@@ -1,11 +1,15 @@
 import React from "react";
-import { ImagesGallery } from "./ImagesGallery";
 import Link from "next/link";
-import { DrawingCanvas } from "./DrawingCanvas";
-import { BuildingForm } from "./BuildingForm";
 
 type Props = {};
 
 export const Dashboard = (props: Props) => {
-  return <BuildingForm />;
+  return (
+    <div className="flex flex-col gap-16 p-4 m-4">
+      Dashboard
+      <Link href="/new-case">
+        <button className="btn btn-primary">Nowa szkoda</button>
+      </Link>
+    </div>
+  );
 };

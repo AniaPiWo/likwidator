@@ -39,10 +39,10 @@ export const Form = (props: Props) => {
   const handleSubmit = async () => {
     try {
       console.log(whisperComponents);
-      alert("Data saved successfully!");
+      alert("Notatka zapisana pomyślnie!");
     } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data.");
+      console.error("Wystąpił bład podczas zapisywania notatki:", error);
+      alert("Nie udało się zapisać notatki.");
     }
   };
 
@@ -60,13 +60,13 @@ export const Form = (props: Props) => {
           onClick={addNewComponent}
           className="mt-4 text-white px-4 py-2 bg-pink-500"
         >
-          Add New Input
+          Nowa notatka
         </button>
         <button
           onClick={handleSubmit}
           className="mt-4 text-white px-4 py-2 bg-green-500"
         >
-          Save All
+          Zapisz notatki
         </button>
       </div>
     </div>

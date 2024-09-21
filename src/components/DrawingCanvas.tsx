@@ -4,7 +4,6 @@ import * as fabric from "fabric";
 import { IoTriangleOutline, IoRemoveOutline } from "react-icons/io5";
 import { BiRectangle } from "react-icons/bi";
 import { FaRegCircle } from "react-icons/fa";
-import { PiDoorThin } from "react-icons/pi";
 type Props = {};
 
 export const DrawingCanvas = (props: Props) => {
@@ -264,7 +263,7 @@ export const DrawingCanvas = (props: Props) => {
       console.log("Canvas JSON data:", canvasData);
 
       // Kopiowanie canvasData do schowka
-      const canvasDataString = JSON.stringify(canvasData);
+      /*       const canvasDataString = JSON.stringify(canvasData);
       navigator.clipboard
         .writeText(canvasDataString)
         .then(() => {
@@ -272,7 +271,7 @@ export const DrawingCanvas = (props: Props) => {
         })
         .catch((err) => {
           console.error("Failed to copy canvas data to clipboard:", err);
-        });
+        }); */
     }
   };
 
